@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'stack for docker'
+Resources: 
+  Docker1: 
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      Tags:
+        -
+          Key: "Name"
+          Value: "Ubuntu-Docker1"
+      ImageId: 'ami-5055cd3f'
+      KeyName: 'MyKeyPair'
+      InstanceType: 't2.micro'
+      SecurityGroupIds:
+        - 'sg-68af0605'
+      BlockDeviceMappings: 
+        - DeviceName: '/dev/sda1'
+          Ebs: 
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+            VolumeSize: '8'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          echo  "--------------------------START-------------------------------------"
+          apt-get -y update
+          apt-get -y install \
+              apt-transport-https \
+              ca-certificates \
+              curl \
+              software-properties-common
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+          apt-key fingerprint 0EBFCD88
+          add-apt-repository \
+             "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+             $(lsb_release -cs) \
+             stable"
+          apt-get -y update
+          apt-get -y install docker-ce
+          curl -L https://github.com/docker/compose/releases/download/1.20.0-rc1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+          echo  "--------------------------FINISH----------------------------"
+  Docker2: 
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      Tags:
+        -
+          Key: "Name"
+          Value: "Ubuntu-Docker2" 
+      ImageId: 'ami-5055cd3f'
+      KeyName: 'MyKeyPair'
+      InstanceType: 't2.micro'
+      SecurityGroupIds:
+        - 'sg-68af0605'
+      BlockDeviceMappings: 
+        - DeviceName: '/dev/sda1'
+          Ebs: 
+            VolumeType: 'gp2'
+            DeleteOnTermination: 'true'
+            VolumeSize: '8'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          echo  "--------------------------START-------------------------------------"
+          apt-get -y update
+          apt-get -y install \
+              apt-transport-https \
+              ca-certificates \
+              curl \
+              software-properties-common
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+          apt-key fingerprint 0EBFCD88
+          add-apt-repository \
+             "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+             $(lsb_release -cs) \
+             stable"
+          apt-get -y update
+          apt-get -y install docker-ce
+          curl -L https://github.com/docker/compose/releases/download/1.20.0-rc1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+          echo  "--------------------------FINISH----------------------------"
+Outputs:
+  Docker1Ip:
+    Description: Ip of Docker1
+    Value:
+      Fn::GetAtt:
+      - Docker1
+      - PublicIp
+  Docker2Ip:
+    Description: Ip of Docker2
+    Value:
+      Fn::GetAtt:
+      - Docker2
+      - PublicIp
+
